@@ -45,17 +45,17 @@ import java.net.InetAddress
  */
 class MaxMindIpGeo(dbInputStream: InputStream, lruCache: Int = 10000, synchronized: Boolean = false, postFilterIpLocation: MaxMindIpGeo.IpLocationFilter = MaxMindIpGeo.unitFilter) {
   
+  // Some people, when confronted with a problem, think "I know, I'll use regular expressions." Now they have two problems.
+  val validNum = """(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])"""
+  val dot = """\."""
+  val validIP = (validNum + dot + validNum + dot + validNum + dot + validNum).r
+  
   /**
    * Helper function that turns string into InetAddress
    * @param address The address for lookup. If it looks like IP address, will use it as such. If not, then it will use it as name.
    * @return Option[InetAddress]
    */
   def getInetAddress(address: String) = {
-    // Some people, when confronted with a problem, think "I know, I'll use regular expressions." Now they have two problems.
-    val validNum = """(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])"""
-    val dot = """\."""
-    val validIP = (validNum + dot + validNum + dot + validNum + dot + validNum).r
-
     try {
       address match {
         case validIP(_, _, _, _) => Some(InetAddress.getByAddress(address.split('.').map(_.toInt.toByte)))
